@@ -312,3 +312,9 @@ Backgrounds
   );
   color: white !important;
 }
+
+#editor {
+  height: 350px !important;
+  width: 100%;
+  margin-bottom: 20px;
+}

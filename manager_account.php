@@ -5,62 +5,59 @@
     <?php include("zc-header.php"); ?>
     <!-- ========================== Grid Home ==========================  -->
     <main class="container py-5">
-        <!-- Edit Account  -->
-        <div>
-            <form action="">
-                <div class="title text-uppercase d-flex align-items-center justify-content-between">
-                    <h5>Edit Account Details</h5>
-                    <div class="d-flex align-items-center justify-content-end">
-                        <button class="btn btn-outline-primary m-1">
-                            Edit
-                        </button>
-                        <button class="btn btn-outline-danger m-1">
-                            Cancel
-                        </button>
-                        <button class="btn btn-outline-success m-1">Save</button>
-                    </div>
-                </div>
-                <div class="row mt-4 g-3">
-                    <div class="col-12 col-lg-6">
-                        <span class="form-label">First Name</span>
-                        <input type="text" class="form-control form-control-lg" disabled />
-                    </div>
-                    <div class="col-12 col-lg-6">
-                        <span class="form-label">Last Name</span>
-                        <input type="text" class="form-control form-control-lg" disabled />
-                    </div>
-                    <div class="col-12 col-lg-6">
-                        <span class="form-label">Telephone No.</span>
-                        <input type="text" class="form-control form-control-lg" disabled />
-                    </div>
-                    <div class="col-12 ">
-                        <span class="form-label">Address</span>
-                        <textarea name="" id="" cols={30} rows={3} class="form-control" disabled></textarea>
-                    </div>
-                </div>
-            </form>
-        </div>
         <!-- Password Manager  -->
-        <div class="mt-5" style="max-width: 500px;">
-            <form action="">
+        <div class="container  border p-3 p-lg-5 rounded-4 shadow" style="max-width: 500px;">
+            <?php
+            if (isset($_POST["update"])) {
+                $old_password = $_REQUEST['old_password'];
+                $new_password = $_REQUEST['new_password'];
+                $confirm_password = $_REQUEST['confirm_password'];
+                $db_old_password = $conn->query('SELECT password FROM admin WHERE id=1')->fetch_assoc()['password'];
+                $pepper = get_cfg_var("pepper");
+                $entered_pwd_peppered = hash_hmac("sha256", $old_password, $pepper);
+                $pwd_peppered = hash_hmac("sha256", $new_password, $pepper);
+                if ($new_password == $confirm_password) {
+                    if ($entered_pwd_peppered == $db_old_password) {
+                        $sql = "UPDATE admin SET password='$pwd_peppered' WHERE id=1";
+                        $update = $conn->query($sql);
+                        if ($update) {
+                            echo '<script>
+                                    alert("Password Update Successfully") ; 
+                                    window.location=window.location;
+                                </script>';
+                        } else {
+                            echo '<script>
+                            alert("Error while updating Password");
+                            window.location=window.location;
+                            </script>';
+                        }
+                    } else {
+                        echo '<script>alert("Please Enter Correct Password")</script>';
+                    }
+                } else {
+                    echo '<script>alert("Please Enter Same Password")</script>';
+                }
+            }
+            ?>
+            <form action="" method="post">
                 <div class="title text-uppercase d-flex align-items-center justify-content-between">
-                    <h5>Reset Password</h5>
-                    <div class="d-flex align-items-center justify-content-end">
-                        <button class="btn btn-outline-success m-1">Save</button>
-                    </div>
+                    <h5>Change Password</h5>
                 </div>
                 <div class="row mt-4 g-3">
                     <div class="col-12 ">
                         <span class="form-label">Old Password</span>
-                        <input type="text" class="form-control form-control-lg" />
+                        <input type="text" name="old_password" class="form-control form-control-lg" />
                     </div>
                     <div class="col-12 ">
                         <span class="form-label">New Password</span>
-                        <input type="text" class="form-control form-control-lg" />
+                        <input type="text" name="new_password" class="form-control form-control-lg" />
                     </div>
                     <div class="col-12 ">
                         <span class="form-label">Confirm Password</span>
-                        <input type="text" class="form-control form-control-lg" />
+                        <input type="text" name="confirm_password" class="form-control form-control-lg" />
+                    </div>
+                    <div class="col-12">
+                        <input class="btn btn-outline-success m-1 w-100 py-3" type="submit" name="update" value="update">
                     </div>
                 </div>
             </form>

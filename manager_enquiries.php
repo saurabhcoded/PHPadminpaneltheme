@@ -4,27 +4,19 @@
 <head>
     <?php include("zc-header.php"); ?>
     <!-- ========================== Grid Home ==========================  -->
+    <div class="bg-light p-4 text-center">
+        <a href="<?php echo $admin_url; ?>">Dashboard</a> /
+        <span>Enquiries</span>
+    </div>
     <main class="container py-5">
-        <div>
-            <div class="d-flex flex-column flex-md-row align-items-center flex-wrap justify-content-between py-3">
-                <div class="input-group rounded-pill border border-success w-100 m-1" style="overflow: hidden;max-width:600px">
-                    <input type="text" name="" id="" class="form-control border-0  ps-4 m-1" placeholder="Search Here the Product Name" style="box-shadow: none;outline:0">
-                    <button class="btn btn-success border-0 rounded-pill px-4">
-                        <i class="bi bi-search"></i> search
-                    </button>
-                </div>
-            </div>
-        </div>
         <div class="table-responsive">
             <table class="table table-bordered table-striped f-size-12 align-middle">
                 <thead>
                     <tr>
-                        <th scope="col">ID</th>
                         <th scope="col">Name</th>
                         <th scope="col">Email</th>
                         <th scope="col">Mobile</th>
-                        <th scope="col">Address</th>
-                        <th scope="col">Subject</th>
+                        <th scope="col">Service Name</th>
                         <th scope="col">Message</th>
                         <th scope="col">Page URL</th>
                         <th scope="col">Enquiry Date</th>
@@ -32,30 +24,47 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php for ($x = 0; $x < 10; $x++) : ?>
+                    <?php $enquiries = $conn->query("SELECT * FROM enquiries ORDER BY created_at ASC;");
+                    while ($enquiry = mysqli_fetch_assoc($enquiries)) { ?>
+                        <?php
+                        if (isset($_POST["deletebutton" . $enquiry['id']])) {
+                            $sql = "DELETE FROM enquiries WHERE id=" . $enquiry['id'];
+                            $delete = $conn->query($sql);
+                            if ($delete) {
+                                echo '<script>
+                                        alert("Enquiry Deleted Successfully") ; 
+                                        window.location=window.location;
+                                        </script>';
+                            } else {
+                                echo '<script>alert("Error while deleting Enquiry")</script>';
+                            }
+                        }
+                        ?>
                         <tr>
-                            <th scope="row"><?php echo $x ?></th>
-                            <td>Saurabh Sharma</td>
-                            <td>saurabhcoded@gmail.com</td>
-                            <td>+91&nbsp;9999-9999-888</td>
-                            <td>New Delhi </td>
-                            <td>Service Name</td>
-                            <td>Nice Product Best for this budget</td>
-                            <td>localhost/v9dindustry/contact-us.html</td>
+                            <td><?php echo $enquiry['name']; ?></td>
+                            <td><?php echo $enquiry['email']; ?></td>
+                            <td><?php echo $enquiry['contact']; ?></td>
+                            <td><?php echo $enquiry['service']; ?></td>
+                            <td><?php echo $enquiry['message']; ?></td>
+                            <td><?php echo $enquiry['page']; ?></td>
+                            <td><?php echo $enquiry['created_at']; ?></td>
                             <td>
-                                2022-11-29 05:45:55
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center justify-content-around">
-                                    <button class="btn p-0" data-bs-toggle="tooltip" data-bs-title="Delete">
-                                        <i class="bi bi-trash text-danger"></i>
-                                    </button>
+                                <div class="d-flex align-items-center justify-content-center flex-wrap">
+                                    <form action="" method="post">
+                                        <input type="submit" class="btn p-0 bg-danger text-white px-2 p-1 m-1" name="<?php echo "deletebutton" . $enquiry['id'] ?>" value="delete" />
+                                    </form>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center flex-wrap">
+                                    <a href="mailto:<?php echo $enquiry['email']; ?>" class="btn p-0 bg-light px-2 p-1 m-1" data-bs-toggle="tooltip" data-bs-title="Email by App">
+                                        <i class="bi bi-envelope-fill text-success"></i>
+                                    </a>
+                                    <a href="tel:<?php echo $enquiry['contact']; ?>" class="btn p-0 bg-light px-2 p-1 m-1" data-bs-toggle="tooltip" data-bs-title="Call Client">
+                                        <i class="bi bi-telephone-fill text-primary"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
-                    <?php endfor; ?>
-
-
+                    <?php } ?>
                 </tbody>
             </table>
         </div>
